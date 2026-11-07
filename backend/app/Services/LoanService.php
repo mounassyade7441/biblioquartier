@@ -89,6 +89,44 @@ class LoanService
     }
 
     /**
+     * RÈGLE 4 — Pourquoi cet emprunt ne peut-il PAS être prolongé ?
+     * Renvoie null s'il peut l'être. Utilisé par extend() ET par l'API pour griser
+     * le bouton "Prolonger" dans React avec la bonne explication.
+     */
+    public function extensionBlockedReason(Loan $loan): ?string
+    {
+        if (! $loan->isActive()) {
+            return 'Ce livre a déjà été rendu.';
+        }
+        if ($loan->extended) {
+            return 'Cet emprunt a déjà été prolongé une fois : une seule prolongation est possible.';
+        }
+        if ($loan->isOverdue()) {
+            return 'Cet emprunt est en retard : il ne peut plus être prolongé. Merci de rapporter le livre au plus vite.';
+        }
+        if ($loan->book->waitingReservations()->exists()) {
+            return "D'autres adhérents attendent ce livre : il ne peut pas être prolongé.";
+        }
+
+        return null;
+    }
+
+    /** RÈGLE 4 — Prolonger un emprunt une seule fois, d'une semaine. */
+    public function extend(Loan $loan): Loan
+    {
+        if ($reason = $this->extensionBlockedReason($loan)) {
+            throw new BusinessRuleException($reason);
+        }
+
+        $loan->update([
+            'due_at' => $loan->due_at->copy()->addDays(Loan::EXTENSION_DAYS),
+            'extended' => true,
+        ]);
+
+        return $loan;
+    }
+
+    /**
      * Enregistre un retour.
      *
      * @return array{loan: Loan, held_for: ?Reservation}

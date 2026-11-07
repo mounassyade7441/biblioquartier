@@ -7,6 +7,9 @@ use App\Http\Controllers\Api\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\Member\LoanController as MemberLoanController;
+use App\Http\Controllers\Api\Member\ReservationController as MemberReservationController;
+use App\Http\Controllers\Api\Member\SummaryController as MemberSummaryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,8 +42,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
     // ---------- 3a. ADHÉRENT uniquement ----------
-    Route::middleware('role:adherent')->group(function () {
-        // (étapes 8-9 : mes emprunts, prolonger, réserver, annuler, historique)
+    // Préfixe /api/my/... = "mes" données : toujours filtrées sur l'utilisateur connecté
+    Route::middleware('role:adherent')->prefix('my')->name('my.')->group(function () {
+        Route::get('/summary', MemberSummaryController::class)->name('summary');
+
+        Route::get('/loans', [MemberLoanController::class, 'index'])->name('loans.index');
+        Route::post('/loans/{loan}/extend', [MemberLoanController::class, 'extend'])->whereNumber('loan')->name('loans.extend');
+
+        Route::get('/reservations', [MemberReservationController::class, 'index'])->name('reservations.index');
+        Route::post('/reservations', [MemberReservationController::class, 'store'])->name('reservations.store');
+        Route::delete('/reservations/{reservation}', [MemberReservationController::class, 'destroy'])
+            ->whereNumber('reservation')->name('reservations.destroy');
     });
 
     // ---------- 3b. BIBLIOTHÉCAIRE uniquement ----------

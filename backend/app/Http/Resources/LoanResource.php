@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Services\LoanService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -31,6 +32,13 @@ class LoanResource extends JsonResource
             // Nombre de jours (calendaires) avant la date limite, ou de retard
             'days_left' => $this->isActive() && ! $overdue ? (int) $today->diffInDays($dueDay) : null,
             'days_overdue' => $overdue ? max(1, (int) $dueDay->diffInDays($today)) : 0,
+
+            // Espace adhérent uniquement (routes "my.*") : peut-il prolonger ? sinon pourquoi ? (règle 4)
+            $this->mergeWhen($request->routeIs('my.*') && $this->isActive(), function () {
+                $reason = app(LoanService::class)->extensionBlockedReason($this->resource);
+
+                return ['can_extend' => $reason === null, 'extend_blocked_reason' => $reason];
+            }),
 
             'book' => $this->whenLoaded('book', fn () => [
                 'id' => $this->book->id,

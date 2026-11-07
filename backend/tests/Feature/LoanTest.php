@@ -224,8 +224,10 @@ class LoanTest extends TestCase
 
     public function test_recherche_d_un_adherent_pour_un_pret(): void
     {
+        $this->member->update(['email' => 'alice@exemple.fr']);
         Loan::factory()->overdue()->create(['user_id' => $this->member->id]);
-        User::factory()->create(['name' => 'Bruno Durand']);
+        // E-mail fixé : un e-mail aléatoire pourrait contenir "alice" et fausser le test
+        User::factory()->create(['name' => 'Bruno Durand', 'email' => 'bruno@exemple.fr']);
 
         $this->getJson('/api/admin/members?search=alice')
             ->assertOk()
