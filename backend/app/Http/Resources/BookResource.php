@@ -37,6 +37,11 @@ class BookResource extends JsonResource
                 $available === 0 && isset($this->active_loans_min_due_at),
                 fn () => Carbon::parse($this->active_loans_min_due_at)->toIso8601String()
             ),
+            // true si cette date est déjà dépassée (l'emprunteur est en retard)
+            'next_return_overdue' => $this->when(
+                $available === 0 && isset($this->active_loans_min_due_at),
+                fn () => Carbon::parse($this->active_loans_min_due_at)->isPast()
+            ),
         ];
     }
 }

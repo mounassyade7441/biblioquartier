@@ -86,7 +86,18 @@ class CatalogTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.is_available', false)
             ->assertJsonPath('data.waiting_count', 2)
+            ->assertJsonPath('data.next_return_overdue', false)
             ->assertJsonStructure(['data' => ['next_return_at']]);
+    }
+
+    public function test_la_fiche_signale_un_retour_deja_en_retard(): void
+    {
+        $book = Book::factory()->create(['total_copies' => 1]);
+        Loan::factory()->overdue()->create(['book_id' => $book->id]);
+
+        $this->getJson("/api/books/{$book->id}")
+            ->assertOk()
+            ->assertJsonPath('data.next_return_overdue', true);
     }
 
     public function test_filtre_disponibles_uniquement(): void

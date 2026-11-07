@@ -3,6 +3,7 @@ import RequireAuth from './components/auth/RequireAuth'
 import Layout from './components/layout/Layout'
 import { ROLES } from './context/AuthContext'
 import AdminHomePage from './pages/admin/AdminHomePage'
+import BookDetailPage from './pages/BookDetailPage'
 import CatalogPage from './pages/CatalogPage'
 import LoginPage from './pages/LoginPage'
 import MemberHomePage from './pages/member/MemberHomePage'
@@ -19,6 +20,7 @@ export default function App() {
       <Route element={<Layout />}>
         {/* ---------- Public (visiteur) ---------- */}
         <Route index element={<CatalogPage />} />
+        <Route path="livres/:id" element={<BookDetailPage />} />
         <Route path="connexion" element={<LoginPage />} />
         <Route path="inscription" element={<RegisterPage />} />
 
