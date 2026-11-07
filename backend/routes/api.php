@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\BookController as AdminBookController;
+use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookController;
 use App\Http\Controllers\Api\CategoryController;
@@ -41,6 +43,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ---------- 3b. BIBLIOTHÉCAIRE uniquement ----------
     Route::middleware('role:bibliothecaire')->prefix('admin')->group(function () {
-        // (étapes 6-9 : gestion des livres, catégories, prêts, retours, tableau de bord)
+        // Catalogue (étape 6) — la consultation passe par les routes publiques /api/books
+        Route::post('/books', [AdminBookController::class, 'store']);
+        Route::put('/books/{book}', [AdminBookController::class, 'update'])->whereNumber('book');
+        Route::delete('/books/{book}', [AdminBookController::class, 'destroy'])->whereNumber('book');
+
+        Route::post('/categories', [AdminCategoryController::class, 'store']);
+        Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->whereNumber('category');
+        Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->whereNumber('category');
+
+        // (étapes 7-9 : prêts, retours, tableau de bord)
     });
 });

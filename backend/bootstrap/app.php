@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\BusinessRuleException;
 use App\Http\Middleware\EnsureUserHasRole;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -28,6 +29,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        // Une règle métier refusée n'est pas un bug : inutile de l'écrire dans les logs.
+        $exceptions->dontReport([BusinessRuleException::class]);
 
         // Messages d'erreur en français, compréhensibles par l'utilisateur final.
         $exceptions->render(function (AuthenticationException $e, Request $request) {
