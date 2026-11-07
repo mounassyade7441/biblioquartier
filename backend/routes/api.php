@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\Admin\LoanController as AdminLoanController;
+use App\Http\Controllers\Api\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookController;
 use App\Http\Controllers\Api\CategoryController;
@@ -52,6 +54,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->whereNumber('category');
         Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->whereNumber('category');
 
-        // (étapes 7-9 : prêts, retours, tableau de bord)
+        // Adhérents, prêts et retours (étape 7)
+        Route::get('/members', [AdminMemberController::class, 'index']);
+        Route::get('/loans', [AdminLoanController::class, 'index']);
+        Route::post('/loans', [AdminLoanController::class, 'store']);
+        Route::post('/loans/{loan}/return', [AdminLoanController::class, 'markReturned'])->whereNumber('loan');
+
+        // (étape 9 : tableau de bord)
     });
 });

@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\BookRequest;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
 use App\Models\Reservation;
+use App\Services\ReservationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -27,11 +28,21 @@ class BookController extends Controller
     }
 
     /** PUT /api/admin/books/{book} — modifier un livre (dont le nombre d'exemplaires) */
-    public function update(BookRequest $request, Book $book): JsonResponse
+    public function update(BookRequest $request, Book $book, ReservationService $reservations): JsonResponse
     {
         $book->update($request->validated());
 
-        return $this->bookResponse($book, 'Le livre a été modifié.');
+        // Règle 6 : si on a ajouté des exemplaires et que des adhérents attendent ce livre,
+        // les nouveaux exemplaires leur sont mis de côté, dans l'ordre de la file.
+        $held = $reservations->assignAvailableCopies($book);
+
+        $message = 'Le livre a été modifié.';
+        if ($held->isNotEmpty()) {
+            $names = $held->load('user')->pluck('user.name')->implode(', ');
+            $message .= " {$held->count()} exemplaire(s) à mettre de côté pour : {$names}.";
+        }
+
+        return $this->bookResponse($book, $message);
     }
 
     /**
