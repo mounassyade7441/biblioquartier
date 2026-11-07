@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Api\Admin\LoanController as AdminLoanController;
 use App\Http\Controllers\Api\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Api\AuthController;
@@ -72,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/loans', [AdminLoanController::class, 'store']);
         Route::post('/loans/{loan}/return', [AdminLoanController::class, 'markReturned'])->whereNumber('loan');
 
-        // (étape 9 : tableau de bord)
+        // Tableau de bord (étape 9)
+        Route::get('/dashboard', AdminDashboardController::class);
     });
 });
