@@ -50,7 +50,8 @@ return [
     |
     */
 
-    'expiration' => null,
+    // Un jeton expire au bout de 7 jours : l'utilisateur devra se reconnecter.
+    'expiration' => env('SANCTUM_EXPIRATION', 60 * 24 * 7),
 
     /*
     |--------------------------------------------------------------------------
