@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -71,6 +72,54 @@ class Book extends Model
         $held = $this->held_reservations_count ?? $this->heldReservations()->count();
 
         return max(0, $this->total_copies - $active - $held);
+    }
+
+    // ----- Scopes du catalogue : Book::search('dune')->inCategory('bd')->get() -----
+
+    /** Recherche par titre OU par auteur (insensible à la casse avec MySQL). */
+    public function scopeSearch(Builder $query, ?string $term): void
+    {
+        $term = trim((string) $term);
+        if ($term === '') {
+            return;
+        }
+
+        // Les parenthèses sont importantes : (titre LIKE … OR auteur LIKE …) AND autres filtres
+        $query->where(function (Builder $q) use ($term) {
+            $q->where('title', 'like', "%{$term}%")
+              ->orWhere('author', 'like', "%{$term}%");
+        });
+    }
+
+    /** Filtre par catégorie, à partir de son slug (ex. "science-fiction"). */
+    public function scopeInCategory(Builder $query, ?string $slug): void
+    {
+        if ($slug) {
+            $query->whereHas('category', fn (Builder $q) => $q->where('slug', $slug));
+        }
+    }
+
+    /** Seulement les livres dont au moins un exemplaire est empruntable maintenant. */
+    public function scopeAvailable(Builder $query): void
+    {
+        $query->whereRaw(
+            'total_copies > (select count(*) from loans where loans.book_id = books.id and loans.returned_at is null)
+                          + (select count(*) from reservations where reservations.book_id = books.id and reservations.status = ?)',
+            [Reservation::STATUS_DISPONIBLE]
+        );
+    }
+
+    /**
+     * Précharge les compteurs nécessaires à availableCopies() en UNE seule requête,
+     * au lieu de 2 requêtes par livre (problème dit "N+1").
+     */
+    public function scopeWithAvailability(Builder $query): void
+    {
+        $query->withCount([
+            'activeLoans',
+            'heldReservations',
+            'reservations as waiting_count' => fn (Builder $q) => $q->where('status', Reservation::STATUS_EN_ATTENTE),
+        ]);
     }
 }
 

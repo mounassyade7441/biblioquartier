@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BookController;
+use App\Http\Controllers\Api\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,7 +25,9 @@ Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 });
 
-// (étape 5 : catalogue, recherche, fiche livre, catégories)
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/books', [BookController::class, 'index']);
+Route::get('/books/{book}', [BookController::class, 'show'])->whereNumber('book');
 
 // ---------- 2. CONNECTÉ (adhérent ou bibliothécaire) ----------
 Route::middleware('auth:sanctum')->group(function () {
