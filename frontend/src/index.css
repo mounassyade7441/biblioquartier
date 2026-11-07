@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/*
+ * Thème BiblioQuartier
+ * Tailwind v4 : les couleurs et polices déclarées dans @theme deviennent
+ * des classes utilisables partout (ex. bg-brand-700, text-ink, font-serif).
+ */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fraunces", ui-serif, Georgia, serif;
+
+  /* Fond "papier" et encre */
+  --color-paper: #faf7f2;
+  --color-ink: #1c1917;
+
+  /* Vert "reliure" : couleur principale */
+  --color-brand-50: #eef7f3;
+  --color-brand-100: #d6ece2;
+  --color-brand-200: #b0d9c7;
+  --color-brand-300: #7fbfa4;
+  --color-brand-400: #4f9f80;
+  --color-brand-500: #2f8264;
+  --color-brand-600: #226a51;
+  --color-brand-700: #1d5543;
+  --color-brand-800: #1a4537;
+  --color-brand-900: #16392f;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+  }
+
+  h1, h2, h3 {
+    @apply font-serif;
+  }
+
+  /* Contour visible au clavier (accessibilité), discret à la souris */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+}
