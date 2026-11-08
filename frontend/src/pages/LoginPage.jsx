@@ -14,6 +14,9 @@ const DEMO_ACCOUNTS = [
   { email: 'alice@exemple.fr', label: 'Alice — 2 emprunts' },
   { email: 'bruno@exemple.fr', label: 'Bruno — en retard' },
   { email: 'chloe@exemple.fr', label: 'Chloé — 3 emprunts' },
+  { email: 'david@exemple.fr', label: 'David — livre mis de côté' },
+  { email: 'emma@exemple.fr', label: "Emma — 1re dans la file" },
+  { email: 'hugo@exemple.fr', label: 'Hugo — 2e dans la file' },
 ]
 
 export default function LoginPage() {
