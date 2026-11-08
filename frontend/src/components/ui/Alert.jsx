@@ -1,4 +1,4 @@
-import { IconAlert, IconCheck, IconInfo } from './Icons'
+import { IconAlert, IconCheck, IconClose, IconInfo } from './Icons'
 
 const STYLES = {
   error: { box: 'border-red-200 bg-red-50 text-red-900', icon: IconAlert, iconColor: 'text-red-600' },
@@ -12,7 +12,7 @@ const STYLES = {
  * <Alert type="error" title="Oups">Impossible de joindre le serveur.</Alert>
  * Les erreurs utilisent role="alert" : elles sont lues immédiatement par les lecteurs d'écran.
  */
-export default function Alert({ type = 'info', title, children, action, className = '' }) {
+export default function Alert({ type = 'info', title, children, action, onDismiss, className = '' }) {
   const style = STYLES[type]
   const Icon = style.icon
 
@@ -27,6 +27,16 @@ export default function Alert({ type = 'info', title, children, action, classNam
         {children && <div className={title ? 'mt-0.5' : ''}>{children}</div>}
         {action && <div className="mt-3">{action}</div>}
       </div>
+      {onDismiss && (
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="-m-1 grid size-7 shrink-0 place-items-center rounded-md opacity-60 hover:bg-black/5 hover:opacity-100"
+          aria-label="Fermer le message"
+        >
+          <IconClose className="size-4" />
+        </button>
+      )}
     </div>
   )
 }

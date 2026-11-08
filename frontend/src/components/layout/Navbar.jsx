@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router'
+import { fetchSummary } from '../../api/member'
+import { useAsync } from '../../hooks/useAsync'
 import { useAuth } from '../../hooks/useAuth'
 import Button from '../ui/Button'
 import { IconBook, IconClose, IconMenu } from '../ui/Icons'
@@ -24,11 +26,26 @@ export function Logo() {
 }
 
 /** Les liens dépendent de qui est connecté : visiteur, adhérent ou bibliothécaire. */
-function linksFor({ isAdherent, isLibrarian }) {
+function linksFor({ isAdherent, isLibrarian }, overdueCount = 0) {
   const links = [{ to: '/', label: 'Catalogue', end: true }]
-  if (isAdherent) links.push({ to: '/mon-espace', label: 'Mon espace' })
+  if (isAdherent) links.push({ to: '/mon-espace', label: 'Mon espace', alert: overdueCount > 0 })
   if (isLibrarian) links.push({ to: '/admin', label: 'Administration' })
   return links
+}
+
+/** Libellé d'un lien, avec une pastille rouge "retard" si besoin. */
+function NavLabel({ link }) {
+  return (
+    <span className="inline-flex items-center gap-2">
+      {link.label}
+      {link.alert && (
+        <>
+          <span className="size-2 rounded-full bg-red-600 ring-2 ring-red-100" aria-hidden="true" />
+          <span className="sr-only">(vous avez un livre en retard)</span>
+        </>
+      )}
+    </span>
+  )
 }
 
 /** Initiales pour l'avatar : "Alice Martin" → "AM" */
@@ -51,7 +68,10 @@ export default function Navbar() {
   const { user, logout } = auth
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
-  const links = linksFor(auth)
+
+  // Adhérent : on récupère son résumé pour afficher une pastille rouge s'il a un retard
+  const summary = useAsync(() => (auth.isAdherent ? fetchSummary() : Promise.resolve(null)), [user?.id])
+  const links = linksFor(auth, summary.data?.overdue_count)
 
   function handleLogout() {
     setOpen(false)
@@ -71,7 +91,7 @@ export default function Navbar() {
           <div className="ml-6 flex items-center gap-1">
             {links.map((link) => (
               <NavLink key={link.to} to={link.to} end={link.end} className={navClass}>
-                {link.label}
+                <NavLabel link={link} />
               </NavLink>
             ))}
           </div>
@@ -127,7 +147,7 @@ export default function Navbar() {
           <div className="flex flex-col gap-1">
             {links.map((link) => (
               <NavLink key={link.to} to={link.to} end={link.end} className={navClass} onClick={close}>
-                {link.label}
+                <NavLabel link={link} />
               </NavLink>
             ))}
           </div>
