@@ -1,5 +1,5 @@
 # Fichiers propres à la machine de développement (non publiés)
 demarrer-dev.bat
-FICHE-ORAL.md
+FICHE-ORAL.*
 .vscode/
 .idea/
