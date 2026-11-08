@@ -4,14 +4,17 @@ import { useId } from 'react'
  * Champ de formulaire accessible : libellé, champ, aide et message d'erreur.
  *
  *   <FormField label="Adresse e-mail" type="email" name="email" error={errors.email} … />
+ *   <FormField as="textarea" label="Résumé" … />
+ *   <FormField as="select" label="Catégorie" …><option …/></FormField>
  *
  * - le <label> est relié au champ (cliquer sur le libellé place le curseur dans le champ)
  * - aria-invalid + aria-describedby : les lecteurs d'écran annoncent l'erreur
  */
-export default function FormField({ label, error, hint, className = '', ...inputProps }) {
+export default function FormField({ as = 'input', label, error, hint, className = '', children, ...inputProps }) {
   const id = useId()
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
+  const Control = as // 'input', 'textarea' ou 'select'
 
   const describedBy = [hint && hintId, error && errorId].filter(Boolean).join(' ') || undefined
 
@@ -21,7 +24,7 @@ export default function FormField({ label, error, hint, className = '', ...input
         {label}
         {inputProps.required && <span className="text-red-600" aria-hidden="true"> *</span>}
       </label>
-      <input
+      <Control
         id={id}
         aria-invalid={Boolean(error)}
         aria-describedby={describedBy}
@@ -31,7 +34,9 @@ export default function FormField({ label, error, hint, className = '', ...input
             : 'border-stone-300 focus:border-brand-500 focus:ring-brand-100'
         }`}
         {...inputProps}
-      />
+      >
+        {children}
+      </Control>
       {hint && !error && (
         <p id={hintId} className="mt-1.5 text-xs text-stone-500">
           {hint}
