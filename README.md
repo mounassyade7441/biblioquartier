@@ -87,7 +87,7 @@ Les fichiers sont dans `backend/app/Services/` et `backend/app/Http/Controllers/
 ### Étape 1 — Récupérer le projet
 
 ```bash
-git clone https://github.com/<votre-compte>/biblioquartier.git
+git clone https://github.com/mounassyade7441/biblioquartier.git
 cd biblioquartier
 ```
 
@@ -319,5 +319,6 @@ Codes de réponse : `401` non connecté · `403` mauvais rôle · `404` introuva
 | Erreur 500 / `SQLSTATE[HY000] [2002]` | MySQL n'est pas démarré, ou les identifiants de `backend/.env` sont faux |
 | Erreur CORS dans la console du navigateur | Le front tourne sur une autre adresse : l'ajouter à `FRONTEND_URL` dans `backend/.env`, puis `php artisan config:clear` |
 | « Trop de tentatives… » à la connexion | Protection anti-force brute : patienter une minute |
+| `composer install` extrêmement lent | Le réseau bloque les téléchargements depuis GitHub : essayer une autre connexion (partage de connexion du téléphone par exemple) |
 | `'vite' n'est pas reconnu` | Lancer `npm install` puis `npm run dev` **dans `frontend/`** (pas dans `backend/`) |
 | Appuyer sur `Ctrl + C` dans un terminal arrête le serveur | Pour copier du texte d'un terminal Windows : sélectionner puis `Entrée` |
